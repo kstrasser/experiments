@@ -10,11 +10,12 @@
     (values (pair (car j) (car k))
             (cdr j) 
             (cdr k)))
+  
   (: p (AnaP3 (Listof c) (Listof d)))
   (define (p j k) 
     (or (empty? j) (empty? k)))
   
-  (unfold3 g p j k))
+  (unfoldl3 g p j k))
 
 (define n 100)
 (define l1 (make-list n 1))

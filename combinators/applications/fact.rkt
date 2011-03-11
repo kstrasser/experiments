@@ -10,15 +10,19 @@
 
 (: factana (ListAna Real Real))
 (define (factana n)
-  (unfold factg factp n))
+  (unfoldl factg factp n))
 
-(: fact (Hylo Real Real))
-(define (fact n)
+(: hfact (Hylo Real Real))
+(define (hfact n)
   (hylo * 1 factg factp n))
 
-(: sum (Hylo Real Real))
-(define (sum n)
-  (hylo + 0 factg factp n))
+(: pfact (Real -> Real))
+(define (pfact n)
+  (: f (ParaF Real Real))
+  (define/match* (f n m)
+    [(0 _) 1]
+    [(_ _) (* n m)])
+  (para/real f n 1))
 
 (: fact* (Real -> Real))
 (define (fact* n)
@@ -28,28 +32,11 @@
           [else (fact** (sub1 n) (* n acc))]))
   (fact** n 1))
 
-(: sum* (Real -> Real))
-(define (sum* n)
-  (: sum** (Real Real -> Real))
-  (define (sum** n acc)
-    (cond [(zero? n) acc]
-          [else (sum** (sub1 n) (+ n acc))]))
-  (sum** n 0))
+(define n 6000)
 
-(define n 5000)
-
-(timetest-suite "factorials: they age like fine wine"
-                (timetest " ...hylomorphically"
-                          (fact n) 'x)
-                (timetest " ...with separate anamorphism and left fold"
-                          (foldl * 1 (factana n)) 'x)
-                (timetest " ...with primitive tail recursion"
-                          (fact* n) 'x))
-
-(timetest-suite "_ ways to sum"
-                (timetest " ...hylomorphically" 
-                          (sum n))
-                (timetest " ...with separate anamorphism and left fold"
-                          (foldl + 0 (factana n)))
-                (timetest " ...with primitive tail recursion"
-                          (sum* n)))
+(timetest-suite
+ (format "factorial(~a)" n)
+ (timetest " ...hylomorphically" (hfact n) 'x)
+ (timetest " ...paramorphically" (pfact n) 'x)
+ (timetest " ...with separate anamorphism and left fold" (foldl * 1 (factana n)) 'x)
+ (timetest " ...with primitive tail recursion" (fact* n) 'x))
