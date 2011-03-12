@@ -1,12 +1,11 @@
 #lang typed/racket
 
-(require "ana.rkt"
-         "cata.rkt")
+(require "ana.rkt")
 (provide (all-defined-out))
 
 (define-type (Hylo a c) (a -> c))
 
-(: hylo (All (a b c) (CataFold a c) c (AnaG a b) (AnaP b) b -> c))
+(: hylo (All (a b c) (a c -> c) c (AnaG a b) (AnaP b) b -> c))
 (define (hylo fold init g p x)
   
   (: hylo* (b c -> c))
